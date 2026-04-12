@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMTI - Chiang Mai Type Indicator</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root {
   --bg: #f6f4fa;
@@ -256,9 +257,22 @@ body::after {
   border-radius: var(--radius);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
-  padding: 32px 24px;
+  padding: 32px 24px 20px;
   text-align: center;
   margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.share-card::before {
+  content: 'CMTI';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-light);
+  letter-spacing: 2px;
+  opacity: 0.6;
 }
 .share-card-title {
   font-size: 15px;
@@ -495,6 +509,7 @@ body::after {
       <div class="share-card-code" id="card-code"></div>
       <img class="result-image" id="card-image" src="" alt="">
       <div class="share-card-tagline" id="card-tagline"></div>
+      <div style="margin-top:16px;font-size:11px;color:var(--accent-light);opacity:0.7;">Chiang Mai Type Indicator · 来测测你是什么类型</div>
     </div>
 
     <!-- 详细结果 -->
@@ -941,22 +956,60 @@ function restart() {
 }
 
 function shareResult() {
-  const code = document.getElementById('result-code').textContent;
-  const name = document.getElementById('result-name').textContent;
-  const tagline = document.getElementById('result-tagline').textContent;
-  const match = document.getElementById('result-match').textContent;
-  const text = `我的CMTI人格是 ${code}（${name}）${tagline}\n${match}\n\n来测测你是什么类型 👉 ${location.href}`;
+  const card = document.getElementById('share-card');
+  const btn = document.querySelector('.result-actions .btn:last-child');
+  const origText = btn.textContent;
+  btn.textContent = '生成中...';
+  btn.disabled = true;
 
-  if (navigator.share) {
-    navigator.share({ title: 'CMTI 测试结果', text: text }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.result-actions .btn:last-child');
-      const orig = btn.textContent;
-      btn.textContent = '已复制到剪贴板 ✓';
-      setTimeout(() => btn.textContent = orig, 2000);
-    });
-  }
+  html2canvas(card, {
+    scale: 2,
+    backgroundColor: '#f6f4fa',
+    useCORS: true,
+    allowTaint: true
+  }).then(canvas => {
+    canvas.toBlob(blob => {
+      const file = new File([blob], 'cmti-result.png', { type: 'image/png' });
+
+      // 尝试系统分享（手机端可直接分享到微信/朋友圈/小红书）
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          title: 'CMTI 测试结果',
+          text: '我的CMTI人格是 ' + document.getElementById('card-code').textContent + '（' + document.getElementById('card-name').textContent + '）',
+          files: [file]
+        }).then(() => {
+          btn.textContent = origText;
+          btn.disabled = false;
+        }).catch(() => {
+          // 用户取消分享，改为下载
+          downloadBlob(blob);
+          btn.textContent = origText;
+          btn.disabled = false;
+        });
+      } else {
+        // 桌面端或不支持分享：直接下载图片
+        downloadBlob(blob);
+        btn.textContent = '已保存图片 ✓';
+        btn.disabled = false;
+        setTimeout(() => btn.textContent = origText, 2500);
+      }
+    }, 'image/png');
+  }).catch(() => {
+    btn.textContent = origText;
+    btn.disabled = false;
+    alert('图片生成失败，请截图保存');
+  });
+}
+
+function downloadBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cmti-result.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 
