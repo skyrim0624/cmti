@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMTI - Chiang Mai Type Indicator</title>
+<style>
+:root {
+  --bg: #f6f4fa;
+  --panel: #ffffff;
+  --text: #1e1a2e;
+  --muted: #6f6a82;
+  --line: #ddd8ea;
+  --soft: #eee9f6;
+  --accent: #7c6d9e;
+  --accent-strong: #5a4a7a;
+  --accent-light: #b8a9d4;
+  --radius: 16px;
+  --shadow: 0 2px 16px rgba(90,74,122,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === Background Decorations === */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+body::before {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(124,109,158,0.1) 0%, transparent 70%);
+  top: -80px; right: -60px;
+}
+body::after {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(184,169,212,0.1) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+}
+
+/* === Container === */
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* === Screens === */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* === Landing Page === */
+.landing {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.landing-logo {
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  color: var(--accent-strong);
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.landing-subtitle {
+  font-size: 16px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+}
+.landing-tagline {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 48px;
+  max-width: 400px;
+  line-height: 1.8;
+}
+
+/* === Buttons === */
+.btn {
+  display: inline-block;
+  padding: 14px 48px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+.btn:hover {
+  background: var(--accent-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(90,74,122,0.25);
+}
+.btn:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.btn-outline:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* === Progress Bar === */
+.progress-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  padding: 16px 0 12px;
+  margin-bottom: 8px;
+}
+.progress-text {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.progress-bar {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* === Question Cards === */
+.question-card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  transition: border-color 0.3s;
+}
+.question-card.answered {
+  border-color: var(--accent-light);
+}
+.question-num {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.question-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  background: var(--soft);
+}
+.option-item:hover {
+  background: var(--line);
+}
+.option-item.selected {
+  background: rgba(124,109,158,0.12);
+  border-color: var(--accent);
+}
+.option-item input[type="radio"] {
+  display: none;
+}
+.option-dot {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  margin-top: 2px;
+  transition: all 0.2s;
+  position: relative;
+}
+.option-item.selected .option-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.option-item.selected .option-dot::after {
+  content: '';
+  position: absolute;
+  top: 4px; left: 4px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+.option-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* === Submit Area === */
+.submit-area {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(transparent, var(--bg) 30%);
+  padding: 32px 0 16px;
+  text-align: center;
+}
+
+/* === Share Card (截图区域) === */
+.share-card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.share-card-title {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.share-card-name {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.share-card-code {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--accent-strong);
+  margin-bottom: 16px;
+}
+.share-card .result-image {
+  margin-bottom: 16px;
+}
+.share-card-tagline {
+  font-size: 14px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* === Result Image === */
+.result-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  object-fit: cover;
+  margin: 0 auto 16px;
+  display: block;
+  box-shadow: 0 4px 20px rgba(90,74,122,0.15);
+}
+
+/* === Results Page === */
+.result-header {
+  text-align: center;
+  padding: 40px 0 32px;
+}
+.result-type-code {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--accent-strong);
+  letter-spacing: 4px;
+}
+.result-type-name {
+  font-size: 20px;
+  color: var(--text);
+  margin-top: 4px;
+}
+.result-tagline {
+  font-size: 16px;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 8px;
+}
+.match-badge {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 6px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.result-desc {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 2;
+  white-space: pre-line;
+}
+
+/* === Dimension Cards === */
+.dim-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  color: var(--text);
+}
+.dim-card {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 8px rgba(90,74,122,0.05);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dim-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dim-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.dim-level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dim-dot.L { background: #6ba3d6; }
+.dim-dot.M { background: #e8b84b; }
+.dim-dot.H { background: #d66b6b; }
+.dim-level-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.dim-score {
+  font-size: 12px;
+  color: var(--accent);
+}
+.dim-interp {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* === Score Bar === */
+.dim-bar-wrap {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  margin: 4px 0;
+}
+.dim-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.dim-bar-fill.L { width: 25%; background: #6ba3d6; }
+.dim-bar-fill.M { width: 55%; background: #e8b84b; }
+.dim-bar-fill.H { width: 90%; background: #d66b6b; }
+
+/* === Result Actions === */
+.result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 40px 0 24px;
+  flex-wrap: wrap;
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .landing-logo { font-size: 48px; letter-spacing: 4px; }
+  .landing-subtitle { font-size: 13px; letter-spacing: 1px; }
+  .landing-tagline { font-size: 15px; margin-bottom: 36px; }
+  .container { padding: 12px 10px; }
+  .question-card { padding: 18px 14px; margin-bottom: 12px; }
+  .question-text { font-size: 15px; }
+  .option-item { padding: 10px 12px; }
+  .option-text { font-size: 14px; }
+  .progress-wrap { padding: 12px 0 8px; }
+  .progress-text { font-size: 13px; }
+  .btn { padding: 12px 36px; font-size: 15px; }
+  .share-card { padding: 24px 16px; }
+  .share-card-name { font-size: 22px; }
+  .share-card-code { font-size: 26px; }
+  .result-image { width: 160px; height: 160px; border-radius: 16px; }
+  .result-type-code { font-size: 32px; }
+  .result-desc { padding: 18px 14px; font-size: 14px; line-height: 1.9; }
+  .dim-card { padding: 14px 16px; }
+  .dim-name { font-size: 13px; }
+  .dim-interp { font-size: 12px; }
+  .dim-section-title { font-size: 18px; }
+  .result-actions { gap: 10px; }
+  .result-actions .btn { padding: 12px 28px; font-size: 14px; }
+}
+
+/* 极小屏幕 */
+@media (max-width: 360px) {
+  .landing-logo { font-size: 40px; }
+  .share-card-code { font-size: 22px; }
+  .result-image { width: 140px; height: 140px; }
+  .question-card { padding: 16px 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== Screen 1: Landing ====== -->
+<div id="screen-landing" class="screen active">
+  <div class="container landing">
+    <div class="landing-logo">CMTI</div>
+    <div class="landing-subtitle">CHIANG MAI TYPE INDICATOR</div>
+    <div class="landing-tagline">MBTI已经过时，SBTI已经过气，CMTI来了。</div>
+    <button class="btn" onclick="startQuiz()">开始测试</button>
+  </div>
+</div>
+
+<!-- ====== Screen 2: Quiz ====== -->
+<div id="screen-quiz" class="screen">
+  <div class="container">
+    <div class="progress-wrap">
+      <div class="progress-text">已答 <span id="answered-count">0</span> / 30</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div id="questions-container"></div>
+    <div class="submit-area">
+      <button class="btn" id="btn-submit" disabled onclick="submitQuiz()">查看结果</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Screen 3: Results ====== -->
+<div id="screen-result" class="screen">
+  <div class="container">
+    <!-- 分享卡片（截图区域）-->
+    <div class="share-card" id="share-card">
+      <div class="share-card-title">你的人格类型是：</div>
+      <div class="share-card-name" id="card-name"></div>
+      <div class="share-card-code" id="card-code"></div>
+      <img class="result-image" id="card-image" src="" alt="">
+      <div class="share-card-tagline" id="card-tagline"></div>
+    </div>
+
+    <!-- 详细结果 -->
+    <div class="result-header">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">你的主类型</div>
+      <div class="result-type-code" id="result-code"></div>
+      <div class="result-type-name" id="result-name"></div>
+      <div class="match-badge" id="result-match"></div>
+    </div>
+    <div style="font-size:18px;font-weight:700;margin:24px 0 12px;">该人格的简单解读</div>
+    <div class="result-desc" id="result-desc"></div>
+    <div class="dim-section-title">📊 你的15维度画像</div>
+    <div id="dim-cards-container"></div>
+    <div class="result-actions">
+      <button class="btn btn-outline" onclick="restart()">重新测试</button>
+      <button class="btn" onclick="shareResult()">分享结果</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// === DATA & LOGIC WILL BE ADDED IN NEXT STEPS ===
+
+// ---- Dimension Meta ----
+const DIM_META = [
+  {id:'W1',name:'工作驱动力',model:'Work'},
+  {id:'W2',name:'自律性',model:'Work'},
+  {id:'W3',name:'抗干扰力',model:'Work'},
+  {id:'S1',name:'社交主动性',model:'Social'},
+  {id:'S2',name:'社交边界',model:'Social'},
+  {id:'S3',name:'社交角色',model:'Social'},
+  {id:'L1',name:'探索欲',model:'Lifestyle'},
+  {id:'L2',name:'美食投入',model:'Lifestyle'},
+  {id:'L3',name:'运动倾向',model:'Lifestyle'},
+  {id:'N1',name:'扎根倾向',model:'Nomad'},
+  {id:'N2',name:'本地融入',model:'Nomad'},
+  {id:'N3',name:'独立性',model:'Nomad'},
+  {id:'C1',name:'情绪外放度',model:'Core'},
+  {id:'C2',name:'生活哲学',model:'Core'},
+  {id:'C3',name:'冒险度',model:'Core'}
+];
+
+// ---- Dimension Explanations (L/M/H) ----
+const DIM_EXPLAIN = {
+  W1:{L:'来清迈就是来生活的，工作能少则少',M:'该工作工作，该享受享受，平衡大师',H:'在清迈比在公司还卷，效率反而更高了'},
+  W2:{L:'时间对你来说就是一个参考值，弹性极大',M:'有大致的节奏，但偶尔也允许自己放飞',H:'作息规律堪比瑞士钟表，连摸鱼都有计划'},
+  W3:{L:'一句"下来吃饭"就能让你放下一切',M:'戴上耳机能扛住大部分干扰，偶尔破防',H:'旁边放鞭炮你都能继续撸码，专注力惊人'},
+  S1:{L:'能在房间待一天不下楼，安静是你的舒适区',M:'看心情和眼缘，社交开关由你掌控',H:'新人还没坐下你已经在问"从哪来待多久"了'},
+  S2:{L:'认识三分钟就能聊到童年创伤，零距离选手',M:'该分享的分享，该保留的保留，分寸感在线',H:'认识半年了别人还不知道你全名，城墙级边界'},
+  S3:{L:'有人组织就跟着走，当跟随者很舒服',M:'偶尔出主意但不爱当头，灵活切换',H:'路线我定、时间我排、人我来叫，天生组织者'},
+  L1:{L:'社区到coworking到固定餐厅，三点一线就很好',M:'常去的地方有几个，偶尔也愿意尝试新的',H:'清迈每个角落都要踩一遍，未知就是最好的目的地'},
+  L2:{L:'7-11和外卖能解决一切，吃饭只是充能',M:'愿意花时间找好吃的，但不至于为了一顿饭跨城',H:'买菜做饭摆盘拍照发群，厨房就是你的主场'},
+  L3:{L:'从床到电脑桌的距离就是今天的运动量了',M:'偶尔游泳跑步，保持基本的身体良心',H:'攀岩游泳网球轮着来，一天不动浑身难受'},
+  N1:{L:'随时可以走，行李箱永远是半打开状态',M:'没有明确计划，走一步看一步',H:'已经在研究长期签证了，这里就是家'},
+  N2:{L:'泰语只会sawadee和ao an nee，够用了',M:'能简单交流砍价问路，在努力融入中',H:'跟摊贩用泰语聊八卦，本地人都以为你住了十年'},
+  N3:{L:'有人一起才出门，独处让你不太自在',M:'有人最好，没人也行，灵活切换',H:'一个人骑摩托去拜县，想停就停，完美'},
+  C1:{L:'内心戏丰富但表面平静如水，情绪都自己消化',M:'跟亲近的人会表达，但不会逢人就说',H:'开心就笑难过就说，全社区都是你的情绪共振板'},
+  C2:{L:'活着开心就行，别想太多，实用主义者',M:'偶尔思考人生，但不会让它影响吃饭',H:'每天都在思考存在的意义，咖啡馆里的哲学家'},
+  C3:{L:'稳定就是最大的幸福，能不冒险就不冒险',M:'偶尔尝试新事物，但会先做好功课',H:'丛林飞跃？来！蹦极？来！不确定性就是你的氧气'}
+};
+
+// ---- 30 Questions (dim: index into DIM_META, qIndex: 0 or 1 for first/second Q of that dim) ----
+const QUESTIONS = [
+  {id:1,dim:0,text:'来清迈之后，你的工作量？',opts:[{t:'大幅减少，来这儿就是来享受生活的',s:1},{t:'跟之前差不多',s:2},{t:'反而更多了，灵感爆棚效率拉满',s:3}]},
+  {id:2,dim:0,text:'早上醒来第一件事？',opts:[{t:'继续睡 / 发呆 / 刷手机，急什么',s:1},{t:'看看消息，慢慢进入状态',s:2},{t:'打开电脑，开干',s:3}]},
+  {id:3,dim:1,text:'你在清迈有固定的作息时间吗？',opts:[{t:'时间对我来说只是一个建议',s:1},{t:'大致有，偶尔放飞',s:2},{t:'非常规律，堪比瑞士钟表',s:3}]},
+  {id:4,dim:1,text:'你的 to-do list 通常？',opts:[{t:'什么是 to-do list？',s:1},{t:'写了，但完成率随缘',s:2},{t:'每天打勾，那种满足感比吃饭还爽',s:3}]},
+  {id:5,dim:2,text:'在社区公共区域工作，旁边有人聊天大笑，你？',opts:[{t:'放下电脑加入聊天',s:1},{t:'戴上耳机但还是忍不住偷听',s:2},{t:'完全听不到，我在自己的世界里',s:3}]},
+  {id:6,dim:2,text:'Lucky 走过来蹭你的腿，你正在工作，你会？',opts:[{t:'立刻放下一切撸狗',s:1},{t:'摸两下继续工作',s:2},{t:'"等一下 Lucky，让我把这段写完"',s:3}]},
+  {id:7,dim:3,text:'社区来了一个新人，你？',opts:[{t:'等别人介绍了再说',s:1},{t:'看眼缘再决定',s:2},{t:'主动上前："你好！你从哪来？待多久？"',s:3}]},
+  {id:8,dim:3,text:'周五空想食堂开饭了，你？',opts:[{t:'窝在房间叫外卖',s:1},{t:'下去看看，到了再说',s:2},{t:'提前问今天做什么菜，准时到场占座',s:3}]},
+  {id:9,dim:4,text:'在社区住了一周后，大家对你的了解程度？',opts:[{t:'已经知道我的星座、血型和感情经历了',s:1},{t:'知道我叫什么、做什么，够了',s:2},{t:'只知道我的外号，真名还是个谜',s:3}]},
+  {id:10,dim:4,text:'有人突然说"今晚一起吃饭吧"，你？',opts:[{t:'好啊好啊！在哪吃？',s:1},{t:'看今天心情和精力吧',s:2},{t:'需要提前预约，临时邀请让我不太舒服',s:3}]},
+  {id:11,dim:5,text:'社区要组织一次出游，你更可能？',opts:[{t:'等有人组织好了我跟着走',s:1},{t:'出出主意，但不想当头',s:2},{t:'我来！路线、时间、交通我全包了',s:3}]},
+  {id:12,dim:5,text:'群里冷场了，你？',opts:[{t:'安静看着，等别人说话',s:1},{t:'发个表情包缓解一下',s:2},{t:'直接起话题："诶今晚谁想去夜市？"',s:3}]},
+  {id:13,dim:6,text:'周末你最可能？',opts:[{t:'在社区待着，哪都不想去',s:1},{t:'去几个常去的地方转转',s:2},{t:'骑车去一个从没去过的地方探索',s:3}]},
+  {id:14,dim:6,text:'有人说"拜县很美你应该去看看"，你？',opts:[{t:'嗯，等以后有机会吧',s:1},{t:'有人一起去的话可以考虑',s:2},{t:'已经在查攻略了，这周就出发',s:3}]},
+  {id:15,dim:7,text:'今天午饭怎么解决？',opts:[{t:'7-11 或者随便吃点什么填饱肚子',s:1},{t:'去外面找个评分高的餐厅试试',s:2},{t:'自己买菜做！还要摆盘拍照发群',s:3}]},
+  {id:16,dim:7,text:'空想食堂你的角色通常是？',opts:[{t:'纯食客，坐等开饭',s:1},{t:'帮忙打下手、洗洗菜切切东西',s:2},{t:'主厨！从选菜到调味全是我的节奏',s:3}]},
+  {id:17,dim:8,text:'在清迈你的日常运动量？',opts:[{t:'从床到电脑桌的距离就是今日运动了',s:1},{t:'偶尔游泳或者跑跑步',s:2},{t:'每天至少一项：攀岩、游泳、网球轮着来',s:3}]},
+  {id:18,dim:8,text:'有人约你早上六点去爬素贴山，你？',opts:[{t:'六点？开什么玩笑',s:1},{t:'如果不用太早的话…七点行吗',s:2},{t:'没问题！到时候我叫你起床',s:3}]},
+  {id:19,dim:9,text:'你打算在清迈待多久？',opts:[{t:'短暂停留，下个月就走。嗯…吧',s:1},{t:'待几个月看看，没有具体计划',s:2},{t:'已经在研究长期签证了，这里就是家',s:3}]},
+  {id:20,dim:9,text:'有人问"你家在哪"，你？',opts:[{t:'我没有家，世界就是我的家',s:1},{t:'这个问题好复杂…我也不确定',s:2},{t:'现在嘛，这里就是家吧',s:3}]},
+  {id:21,dim:10,text:'你的泰语水平？',opts:[{t:'sawadee krub/ka，以及指着菜单说 "ao an nee"',s:1},{t:'能简单交流、砍价、问路',s:2},{t:'跟摊贩用泰语聊八卦毫无压力',s:3}]},
+  {id:22,dim:10,text:'你在清迈最常活动的范围？',opts:[{t:'社区 → coworking → 几家固定餐厅，三点一线',s:1},{t:'古城里常去的几个地方，偶尔去新的',s:2},{t:'城里到郊外的寺庙山里，没有我没去过的',s:3}]},
+  {id:23,dim:11,text:'计划一次出行，你更倾向？',opts:[{t:'跟朋友一起，有人陪才有意思',s:1},{t:'有人去最好，没人也能自己玩',s:2},{t:'一个人骑摩托，想停就停，完美',s:3}]},
+  {id:24,dim:11,text:'在清迈遇到困难（比如摩托抛锚），你第一反应？',opts:[{t:'立刻在群里求助 @所有人',s:1},{t:'先自己试试，搞不定再问人',s:2},{t:'自己搞定，这种事不需要麻烦别人',s:3}]},
+  {id:25,dim:12,text:'今天心情不好，你会？',opts:[{t:'自己消化，不想让别人知道',s:1},{t:'跟关系最好的朋友说一下',s:2},{t:'在群里发"今天emo了"然后等人来关心',s:3}]},
+  {id:26,dim:12,text:'社区有人过生日，你？',opts:[{t:'默默说一句"生日快乐"',s:1},{t:'一起唱歌吃蛋糕',s:2},{t:'策划惊喜派对，比寿星还激动',s:3}]},
+  {id:27,dim:13,text:'你来清迈最根本的原因？',opts:[{t:'物价便宜、气候好、签证方便，就这么简单',s:1},{t:'想换个环境，体验不同的生活',s:2},{t:'在探索一种新的活法，想重新认识自己',s:3}]},
+  {id:28,dim:13,text:'躺在社区院子里发呆的时候，你脑子里在想？',opts:[{t:'今天中午吃什么',s:1},{t:'最近手头的项目和计划',s:2},{t:'人为什么活着这种宏大问题',s:3}]},
+  {id:29,dim:14,text:'有人说"明天去试试丛林飞跃"，你的第一反应？',opts:[{t:'你们去吧，我在地面上等你们，帮你们拍照',s:1},{t:'有点怕…但好像可以试试？',s:2},{t:'走！还有没有更刺激的？',s:3}]},
+  {id:30,dim:14,text:'ET 又越狱了！凌晨两点，有人发群说 ET 翻墙跑了，你？',opts:[{t:'关好自己的门，明天再说吧',s:1},{t:'回个消息"需要帮忙吗"，但没有下楼',s:2},{t:'穿上拖鞋直接冲出去找猫！',s:3}]}
+];
+
+// ---- TYPE_LIBRARY will be added in P2.3 ----
+const TYPE_LIBRARY = [
+// ---- 动物类 6 个 ----
+{code:'ET',name:'倔行者',tagline:'只往前，绝不回头',vector:'MMHMHLMLLLLHLMH',img:'images/et.png',desc:`（ET是CMI社区的一只无毛暹罗猫，只往前走绝不后退，经常把自己缠在椅子腿上，还曾连开两道门越狱出逃。）
+
+恭喜你，你测出了CMI社区最具传奇色彩的人格。你就像那只无毛暹罗猫ET——只往前冲，绝不回头。哪怕前面是一根把你缠得死死的椅子腿，你也会选择继续往前绕，直到把自己绕成一个行为艺术装置。
+
+ET型人格的大脑里只装了一个齿轮，而且这个齿轮只会往一个方向转。后退？不存在的。认错？那是另一个宇宙的概念。你不是固执，你是在用行动向宇宙证明一个真理：只要方向是前，弯路也是直路。
+
+但别被你的倔劲儿骗了——ET的真正绝活是"耐得住寂寞"。被拴着？行。被关着？也行。被当成傻子？无所谓。因为你知道，所有的安分守己都在为那个关键时刻蓄力。一旦时机到了，你会连开两道门，翻墙越狱，在外面浪一整晚，然后——第二天早上准时回来吃早饭。
+
+你渴望自由，但你不逃避责任。你只是在等一个值得越狱的夜晚。`},
+
+{code:'LUCKY',img:'images/lucky.png',name:'暖场王',tagline:'走到人群中央，然后躺下',vector:'MMLHLMMMLHMLHMM',desc:`（Lucky是CMI社区的狗狗，聪明通人性，每次活动都会走到人群中央躺下，深夜还会去敲你的房门找你玩。）
+
+你就是社区的Lucky——不管谁来，你都会迎上去。不是因为你想表现什么，而是因为你天生就觉得：每一个出现在你面前的人，都值得被欢迎。
+
+你总能出现在人群最需要你的地方。新人第一天来、不知道该坐哪的时候，你已经自然地凑过去了。你不会刻意组局，但饭桌上你在的那一桌永远最热闹。就像Lucky——走到人群中央，往地上一躺，大家就自动围过来了。你不需要做任何事，你的存在本身就是一场暖场。
+
+你的眼睛骗不了人。就像Lucky那双叽里咕噜转的眼珠子，你在想什么别人都看得见——你的善意是藏不住的那种。即使带着伊丽莎白圈、即使刚剃完毛丑得像个行走的表情包，你依然是所有人想靠近的那一个。
+
+你知道每个人住在哪里。不是刻意记的，是你真的在乎。深夜那个挠门声不是闹鬼——是你又去找人了，因为你觉得，没有人应该一个人待着。`},
+
+{code:'MILAN',img:'images/milan.png',name:'米兰',tagline:'想靠近，又怕你发现',vector:'LLMLHLLHLMLLLML',desc:`你来社区的第一周：在角落里观察了三天，确认公共厨房没人的时间窗口，然后精确地在那15分钟内完成了一碗泡面的全部工序。吃完洗完碗，一切恢复原样，像你从没来过一样。
+
+就像那只叫米兰的小白猫，你天生需要狭小的角落——因为那里让你觉得安全。窗帘后面、沙发缝隙、行李箱旁边，这些才是你的领地。你不是不喜欢人，你只是需要一个可以随时撤退的位置。
+
+但你的秘密是：你比谁都贪吃。不管别人在吃什么，你都会不自觉地靠近，然后用眼神无声地说"我可以尝一口吗"。食物是你唯一放下边界的理由。空想食堂开饭的时候，你是最早闻到味道、最晚出现在餐桌的那个人。
+
+一旦有人耐心地陪你度过了那个慢热期——可能三天，可能三周——你就会像米兰被挠到下巴时那样，眯着眼睛，呼噜噜响，把整个柔软的自己交出来。只是第二天，你可能又躲回角落去充电了。因为对你来说，安全感不是别人给的，是那个随时可以缩回去的角落给的。`},
+
+{code:'SQUIRREL',img:'images/squirrel.png',name:'反差怪',tagline:'看起来很忙，实际在摸鱼',vector:'LLLMMLMLMMLMLLL',desc:`你就像社区院子那棵大树上的松鼠——永远在忙。沿着树干往上爬、顺着电线跑到对面、抱着不知道什么东西急匆匆地窜过屋顶。所有人看着你都会说："哇，好勤奋。"
+
+但没人知道你到底在忙什么。包括你自己。
+
+SQUIRREL型人格最大的天赋是"表演忙碌"。你的电脑永远开着八个窗口，但其中五个是购物网站；你的日程表排得满满当当，但仔细一看有三项是"午觉"；你走路带风、说话带节奏，给人一种随时在赶deadline的感觉——实际上你的deadline三天前就过了，你只是还没想好怎么跟客户解释。
+
+而最精彩的反差是你的声音。就像那些松鼠，外表毛茸茸忙忙碌碌人畜无害，叫起来却像恐怖片配音。你看起来是团队里最靠谱的那个，但你的内心独白暗黑得连你自己都害怕。你表面上说"好的没问题马上处理"，脑子里想的是"我要是把电脑合上假装断网会不会有人发现"。
+
+但你知道吗？这种反差才是你最迷人的地方。因为你证明了一件事：效率跟看起来忙不忙，真的毫无关系。`},
+
+{code:'404',img:'images/404.png',name:'社区幽灵',tagline:'食物消失了，没人看到是谁',vector:'MMMLHLLMLMLMLLL',desc:`冰箱里的芒果少了一个。桌上的薯片开了口。昨晚的剩饭被吃了一半。
+
+没有指纹。没有脚印。没有监控死角以外的任何证据。
+
+如果CMI社区是一部悬疑片，你就是那个从第一集到最后一集都没露脸，但每一集都改变了剧情走向的幕后角色。你的存在感低到了一种艺术境界——不是你不存在，是你选择了在存在和不存在之间反复横跳。
+
+404人格的核心哲学是：最好的参与方式就是不被发现的参与。你不是社恐，你是"社隐"。你在群里从不发言但每条消息都看了；你从不组织活动但每次活动你都在场的某个角落；你的名字不在任何签到表上，但冰箱知道你来过。
+
+你是社区的暗物质——看不见、摸不着，但没有你，整个社区的食物质量守恒定律就无法成立。`},
+
+{code:'GU-GU',img:'images/gugu.png',name:'咕咕帝',tagline:'比闹钟准，比闹钟烦',vector:'MHHLMLLLLMLHLLL',desc:`早上六点十五。窗外传来第一声"咕——咕——"。你翻了个身，心想再睡五分钟。六点十六，"咕咕——咕——"。六点十七，"咕咕咕咕咕咕咕——"。你把枕头捂在头上。没用。你拉上窗帘。没用。你甚至考虑过搬到一楼。但你知道，鸽子会找到你的。
+
+因为你就是那只鸽子。
+
+GU-GU型人格的核心特质是：极度规律，且完全不在乎别人的感受。你不是故意扰民，你只是在执行你的时间表，而你的时间表恰好比全社区所有人的闹钟都早。你六点起床不是因为自律，是因为你的生物钟根本没有"赖床"这个选项。
+
+你做事有自己的节奏，雷打不动。别人在讨论今天去哪玩的时候你已经晨跑完了；别人纠结午饭吃什么的时候你已经吃完在午休了；别人深夜还在院子里聊人生的时候你已经睡了两个小时了。你不是不合群，你只是跟这个群不在同一个时区。
+
+你是社区的活体时钟。虽然没人设定过你，但所有人都在不知不觉中被你校准了作息。`},
+
+{code:'MIHUA',img:'images/mihua.png',name:'米花',tagline:'躺着躺着，就躺到了远方',vector:'LLLLMLLLLLLLLML',desc:`（米花是CMI社区曾经的一只暹罗猫，最爱的事情就是在院子里随地葛优躺，敞着肚皮晒太阳。直到有一天，她消失了，再也没有回来。）
+
+你是社区里最舒服的存在。别人在卷、在社交、在探索、在思考人生意义，你在沙发上躺着。不是那种假装休息实际在焦虑的躺，是真正的、彻底的、把肚皮翻给全世界看的那种躺。你的舒适区不是一个区域，是一种状态——任何地方，只要你往那一摊，那里就变成了你的舒适区。
+
+但所有人都低估了你。他们以为你会永远躺在那里，以为你对一切都无所谓，以为你的世界就是社区这个院子。直到有一天，大家突然发现——你不见了。没有告别、没有预告、没有任何征兆。就像你平时翻身一样自然，只不过这一次，你翻到了院子外面。
+
+没人知道你去了哪里。也许你在另一个院子找到了更好的阳光，也许你在某条街角发现了更舒服的地面，也许你只是想看看——躺在别的地方，天空是不是不一样。
+
+你教会了所有人一件事：最懒的那个人，不一定是走不动的那个人。可能只是还没找到一个值得站起来的理由。`},
+
+// ---- 人类类前 6 个 ----
+{code:'WIFI',img:'images/wifi.png',name:'标准游民',tagline:'WiFi、护照、咖啡，齐了',vector:'MMMMMLHLLLMHMMM',desc:`你的全部身家可以装进一个28寸行李箱。不是因为穷，是因为你花了三年时间把生活精简到了极致：一台电脑、三件T恤、一个万国转换插头，以及一种坚定的信念——只要有WiFi的地方，就是办公室。
+
+你是数字游民这本教科书的标准答案。签证快到期了？换个国家。房租太贵了？换个城市。这家咖啡店WiFi不行？换一家。你的人生哲学可以总结为两个字：轻装。轻装上阵、轻装转场、轻装到连感情都不太敢往重了谈。
+
+你在清迈、巴厘岛、里斯本、麦德林的咖啡馆都有"自己的位子"，但没有一个地方有你的钥匙。你把"自由"挂在嘴边，但偶尔深夜关上电脑的那一刻，你会想：自由的反面不是束缚，是没有一个地方会因为你不在而少点什么。
+
+不过这个念头只持续三秒钟。因为你马上打开了机票比价网站——下一站去哪？`},
+
+{code:'CTRL+Z',img:'images/ctrlz.png',name:'撤回者',tagline:'想认真工作但总被打断',vector:'HMLHLLMMLMMLHML',desc:`你是CMI社区最矛盾的存在。你打开电脑，深呼一口气，心想：今天一定要把那个项目推进。然后你听到楼下有人笑。好奇心战胜了deadline，你探头一看——三个人在聊天。你心想"就下去五分钟"。
+
+三个小时后，你跟人聊完了星座、聊完了哲学、聊完了为什么711的三明治突然涨价了两泰铢。你回到电脑前，屏幕已经自动锁屏了。你解锁，看着那个空白的文档，内心升起一股深深的内疚感。
+
+于是你郑重地打下了第一行字。
+
+然后有人敲门："下来吃饭！"
+
+你的人生就是一场永恒的Ctrl+Z——每一次"撤回"都充满了诚意，每一次"重来"都饱含决心，但结果永远是：明天再说。CMI社区对你来说既是天堂也是地狱：这里的人太有趣了，以至于你的工作效率跟这里的WiFi信号成反比——不是WiFi不行，是人太行了。`},
+
+{code:'CHEF',img:'images/chef.png',name:'厨神',tagline:'来时不会做饭，走时能开餐厅',vector:'MMLHLHMHLHHLHML',desc:`你来清迈的第一天，唯一会做的菜是泡面加蛋。三个月后，你在空想食堂里颠勺爆炒，一桌十二个人吃得头都抬不起来，有人含泪说这是他在国外吃过最好的一顿。你淡定地擦了擦手说："一般一般，火候还差点意思。"
+
+CHEF型人格的秘密是：你做的不是饭，是连接。你发现了一个人生真理——没有什么社交破冰是一顿饭解决不了的，如果有，那就两顿。你不需要找话题、不需要搞活动、不需要费心思经营关系。你只需要说一句"今晚我做饭"，整个社区就活了。
+
+你的手机相册里，菜的照片比自拍多三倍。你逛菜市场比逛商场兴奋。你跟摊贩大姐已经熟到她会自动帮你把香菜挑出来因为她知道你不吃。你的行李箱里有一把从国内带来的菜刀，过海关的时候你面不改色。
+
+有人说你是来旅居的，但其实你是来修行的——你的道场在厨房，你的经文是菜谱，你的涅槃是所有人吃完说"再来一碗"的那个瞬间。`},
+
+{code:'RIDE',img:'images/ride.png',name:'骑士',tagline:'人在风里，心在路上',vector:'LMMMMLHLMLHHMMH',desc:`别人来清迈坐飞机，你骑摩托来的。不是租的那种小绵羊，是你自己的、跟你跑过三个国家的那台，引擎声一响整条街都知道你来了。你的裤子永远沾着机油，头盔永远挂在车把上，手机导航永远是开着的——不是因为你不认路，是因为你随时可能改变目的地。
+
+RIDE型人格的哲学很简单：人生的意义不在终点，在于那段风灌进衣领的过程。你害怕的不是危险，是固定。固定的地址、固定的关系、固定的daily standup——这些词对你来说比弯道超车还恐怖。
+
+你的朋友圈永远是公路、山路、泥路，偶尔一张加油站自拍。别人问你"在哪呢"，你的回答永远是一个别人没听说过的地名。你的社交方式是："这周末去拜县？""上周刚去过了，这次去夜丰颂。""那在哪？""不知道，到了就知道了。"
+
+你不是在逃避什么，你只是天生就觉得——路的尽头永远应该是另一条路。`},
+
+{code:'MAX',img:'images/max.png',name:'玩商王',tagline:'世界是一个巨大的游乐场',vector:'LLLHLHHMHLHMHLH',desc:`你的日程表不叫日程表，叫"关卡列表"。周一攀岩、周二丛林飞跃、周三粘粘铺布、周四骑摩托去山里、周五……周五你已经在研究下周的新项目了。别人来清迈是旅居，你是来通关的。
+
+MAX型人格的核心驱动力是：无聊比贫穷更可怕。你的快乐阈值比普通人高三倍——别人觉得"去个咖啡馆坐坐"就算出门了，你觉得今天要是没有一项活动让你心跳超过120，这一天就等于没活。
+
+你是社区的活动雷达。哪里新开了一家攀岩馆你第一个知道，哪个瀑布还没被游客发现你已经去过两次了，哪个夜市有别人没试过的虫子宴你不但试了还发了测评。你不理解一个人怎么可以在房间里待一整天——"外面有一整个世界在等你啊？？？"
+
+有人说你是在逃避思考，但其实你比谁都清楚——生命的密度不是用时间量的，是用体验量的。你只是选择了把每一天都活成别人的一整年。`},
+
+{code:'GYM',img:'images/gym.png',name:'体校生',tagline:'清迈就是我的体校',vector:'MHHMMLLMHMMMLMM',desc:`你的一天是这样的：六点半起床，晨跑五公里。九点游泳一小时。下午三点攀岩。傍晚打一场网球或者羽毛球。晚上做做拉伸，看看运动数据，满意地睡去。别人问你"今天工作了吗"，你真诚地反问："运动不算工作吗？"
+
+GYM型人格来清迈不是来旅居的，是来上体校的。这里的健身房便宜到哭、攀岩馆多到离谱、游泳池随便用、还有一群随时能约的运动搭子——你终于找到了一个可以把运动当正职的地方，而且没人会觉得你不务正业。
+
+你的社交圈是按运动项目分类的：攀岩群、跑步群、网球群、游泳群。你的微信步数每天两万起步，手机屏幕上全是运动APP的通知。你的行李箱里运动装备占了三分之二，衣服只带了换洗的。
+
+别人以为你只是爱运动，但你知道真相：你是在用身体的疲惫换大脑的安静。跑到第五公里的时候，那些焦虑、纠结、人生意义之类的东西全都蒸发了。你的禅不在寺庙里，在第八组深蹲之后的那口喘息里。`},
+
+// ---- 人类类中 6 个 ----
+{code:'STAR',img:'images/star.png',name:'交际花',tagline:'陌生人只是还没认识的朋友',vector:'MMLHLHMMLMMLHMM',desc:`你来社区第一天就加了十五个人的微信。第三天已经知道了谁跟谁以前认识、谁刚分手、谁在找室友。第一周结束的时候，老成员开始问你"那个谁来着"——因为你居然比他们还了解这个社区。
+
+STAR型人格天生自带社交Wi-Fi，走到哪儿信号覆盖到哪儿。你不需要破冰技巧，因为你本身就是一台破冰船。你的超能力是让任何人在三分钟之内觉得跟你认识了三年——不是因为你圆滑，是因为你真的对每一个人都好奇。
+
+你是社区的人形枢纽。"你认识做设计的人吗？""问STAR。""谁知道那家咖啡馆叫什么？""问STAR。""今晚有什么活动？""STAR肯定知道。"你已经不是在社交了，你是社区的基础设施。
+
+但你的朋友很少知道的是——你偶尔也会累。你在人群中发光的时候谁都看得到，但你一个人回到房间关上门的那一刻，你也需要在黑暗里安静地待一会儿。你温暖别人是天赋，但给自己充电这件事，你还在学。`},
+
+{code:'JET-LAG',img:'images/jetlag.png',name:'时差人',tagline:'你的凌晨是我的早九',vector:'HHHLMLLLLMLMLML',desc:`晚上十一点，院子里最后一波人聊完散去了。你泡了一杯咖啡，打开电脑，深呼一口气——终于，属于你的工作日开始了。你的Slack亮起绿灯，纽约的同事发来消息："Morning!" 你回了一句"Morning"，窗外是清迈的月亮。
+
+JET-LAG型人格活在一个平行宇宙里。你的身体在东七区，灵魂在西五区。你的"早餐"是别人的夜宵，你的"下班时间"是别人的起床闹钟。你在清迈住了三个月，但从未见过这里上午十点的阳光——因为那是你的凌晨三点。
+
+你已经习惯了这种错位。社区里的热闹与你无关，不是你不想参与，是你真的在开会。当所有人在讨论晚饭吃什么的时候，你正在跟客户做季度汇报。当所有人在院子里看星星的时候，你刚打完一个两小时的电话，累得只想倒头睡去。
+
+但你不觉得孤独。深夜的清迈安静得刚刚好，没有人打扰、没有社交压力、只有你和屏幕和一杯凉透了的咖啡。你选择了最极端的自律方式——把整个白天让给自由，把整个黑夜献给工作。这不是时差，这是你跟世界达成的一份秘密协议。`},
+
+{code:'ALIAS',img:'images/alias.png',name:'代号',tagline:'没人知道我的真名',vector:'MMMLHLMLMLLHLHM',desc:`你在社区住了两个月。所有人都叫你的外号。有人叫你"那个做设计的"，有人叫你"三楼的"，有人叫你一个跟你本名毫无关系的英文名。你从不纠正，甚至有点享受——因为每一个名字都是一层保护壳。
+
+ALIAS型人格的核心信仰是：名字是最危险的锚点。一旦别人知道了你的真名，你就会被钉在一个身份上——某某公司的某某，某某学校毕业的某某，某某的前任。但在这里，你可以只是"那个人"。没有履历、没有标签、没有搜索引擎能挖出的数字痕迹。
+
+你不是在隐藏什么见不得人的过去。你只是发现了一个真理：当没有人知道你"应该"是谁的时候，你才能自由地成为你"想要"成为的人。你在每一个城市都是新的、在每一段关系里都是轻的、在每一次自我介绍里都是未完成的。
+
+社区的人觉得你很神秘。但你知道，这不是神秘，这是一种非常认真的自由练习——你正在测试一个假设：如果剥掉所有身份标签，最后剩下的那个人，还是不是你。`},
+
+{code:'POKER',img:'images/poker.png',name:'牌手',tagline:'人生就是一场德州扑克',vector:'MMHMMMMLLLLMLLH',desc:`周五晚上，院子里的长桌被清出来了，Lucky趴在桌脚下，有人从空想食堂端来一盘没吃完的炒饭当零食。筹码摆好，你扫了一眼手牌，面无表情地跟注。不是因为牌好，是因为你想看看对面那个人会怎么反应。三轮过后你all in了，对面弃牌。你翻开手牌——一对三。整桌人骂你疯子。你微笑着收筹码，Lucky被吓得换了个位置。
+
+POKER型人格把整个人生都当成一场牌局。你不信运气，你信概率；你不怕输，你怕没有博弈的机会。你来清迈不是因为这里便宜，是因为这里的不确定性足够高——明天会遇到什么人、发生什么事、出现什么机会，全都是未知的。而你热爱未知。
+
+你做决策的速度比所有人都快，因为你永远在计算期望值。群里有人说"走，去夜丰颂"，别人还在犹豫，你已经在查路线了——不是因为你真的想去，是因为你算了一下：未知目的地的期望收益大于待在社区的确定收益。连晚饭吃不吃空想食堂，你脑子里都跑了一遍决策树。
+
+你最享受的时刻不是赢的时候，是那个all in之后、结果揭晓之前的三秒钟。那三秒里，你活着的感觉比任何时候都强烈。`},
+
+{code:'IMPRO',img:'images/impro.png',name:'即兴者',tagline:'人生没有剧本',vector:'LLLHLMMLLMMLHHH',desc:`"给我一个词。"你站在社区院子里，面对着五个一脸懵的观众。有人喊了一句"芒果"。你深吸一口气，然后开始了一段关于一个芒果卖家爱上了榴莲商人的即兴独白——三分钟后所有人都笑趴了，包括路过的Lucky。
+
+IMPRO型人格来清迈不是来找WiFi的，是来找自己的。你在国内可能是程序员、是会计、是产品经理，但在这里你终于可以大声说出那句憋了好多年的话："我想演戏。"不是那种正经的演戏，是即兴的、荒诞的、说错了也没关系的那种。
+
+你是社区里最敢暴露自己的人。别人在小心翼翼地经营人设，你在台上把自己的尴尬、恐惧和不确定全部摊开来。你发现了一个秘密：当你主动让自己变得脆弱的时候，反而是你最强大的时候。因为没有什么比一个不怕丢脸的人更无敌了。
+
+即兴戏剧教会了你两件事。第一件：永远说"Yes, and"——接住一切，然后往前走，不否定、不退缩、不说"但是"。第二件更重要：你得到的，就是你所付出的。你在台上交出多少真实，观众就还你多少共鸣。你在生活里袒露多少自己，世界就向你打开多少。你的人生没有剧本，但这不是bug，是feature。`},
+
+{code:'HIDE',img:'images/hide.png',name:'消失术',tagline:'我就在这，但你找不到我',vector:'MMMLHLLLLMLHLML',desc:`社区搞过一次捉迷藏比赛。场地不大，就那么几栋楼加一个院子。所有人在十分钟内都被找到了——除了你。二十分钟过去了，没人知道你在哪。三十分钟，有人开始怀疑你是不是已经出门了。最后你从一个所有人都检查过两遍的地方走出来，脸上带着一种难以形容的满足感。
+
+HIDE型人格的超能力是选择性隐身。你不是404那种天然存在感低——你是明明在场，但就是让你看不见。你出现在每次活动里，但群聊合影永远找不到你；你在公共区域工作，但你选的那个位置刚好是所有人视线的盲区；你知道社区里所有的角落、所有的逃生路线、所有"如果有人来了我可以假装在看手机"的最佳角度。
+
+你不是社恐。你只是发现了一种比社交更有趣的游戏：在人群中隐身。你享受的不是孤独，是那种"我看得到你们但你们看不到我"的自由感。这是一种主动的、有尊严的、甚至有点骄傲的消失。
+
+社区少了你不会有人立刻发现。但过几天一定有人说："诶，好像好久没看到那个谁了？"——这句话，就是你存在过的最好证明。`},
+
+// ---- 人类类后 6 个 ----
+{code:'DUMP',img:'images/dump.png',name:'饺子王',tagline:'空想食堂，他吃的最多',vector:'LLLHLLLLHMHLHLL',desc:`每周空想食堂开饭，你是第一个坐下的，最后一个离开的。你盘子里的份量是别人的两倍，但你从不觉得不好意思——因为你是真的在认真对待每一口食物。当别人把吃饭当作社交的附属品时，你把社交当作吃饭的附属品。
+
+DUMP型人格的世界观很简单：好吃的东西就应该多吃，不好吃的东西不值得活着。你来清迈不是因为这里便宜，是因为这里的芒果糯米饭让你哭了。你评价一个城市不看GDP看夜市，评价一个社区不看WiFi看食堂。你的社区融入速度取决于这里的饭好不好吃——如果好吃，你明天就续租。
+
+你是社区里最真实的人。你不装、不端、不假客气。"好吃！""不好吃。""还有吗？"这就是你的全部社交词汇。你用胃跟世界建立关系，用吃来表达喜怒哀乐：开心了吃顿好的庆祝，难过了吃顿好的安慰，无聊了……那就再吃一顿。
+
+你是空想食堂的定海神针。因为大家都知道——只要你还在吃，说明今天这顿饭，是成功的。`},
+
+{code:'SD',img:'images/sd.png',name:'山东人',tagline:'打引号的那种',vector:'MMLHLMMMMMMHLMM',desc:`你可能是山东人，也可能不是。这不重要。重要的是，从你进社区的那一天起，你就成了所有"山东男人"梗的活靶子。有人搬行李，大家看你："山东人不帮一下？"有人开不了瓶盖，大家看你："山东人不是力气很大吗？"有人需要喝酒搭子，大家看你——你甚至还没开口。
+
+SD型人格的核心能力是：用幽默消解一切。你不是不介意被调侃，你是享受被调侃。因为你很早就发现了一个真理——当你自己先笑了，就没有人能真正伤害你。你是社区的梗王，不是因为你最搞笑，而是因为你最愿意当那个被笑的人。
+
+你的铠甲是幽默。别人用才华、用成就、用人设来保护自己，你用一句"我是山东人嘛"就化解了所有尴尬。你看起来大大咧咧什么都不在乎，但你的笑话从来都不是随便说的——每一个梗的背后都是精确的分寸感：知道什么时候该逗人笑，什么时候该让自己被笑。
+
+没有人知道"山东人"这三个字背后那个真实的你是什么样的。但这也许就是你想要的——在所有人都在笑的时候，你是最安全的。`},
+
+{code:'ZEN',img:'images/zen.png',name:'灵修者',tagline:'来清迈找自己',vector:'LHMLMLMLMMHMLHL',desc:`你的闹钟设在凌晨五点。不是为了工作，是为了冥想。你在素贴山的寺庙里坐过三天禅修，在古城的瑜伽馆里把自己折成了一个人形椒盐卷饼，在夜晚的院子里盘腿打坐的时候被Lucky的舔舌头声打断过至少十七次。
+
+ZEN型人格来清迈不是来玩的，是来找自己的。你的行李箱里有三本关于正念的书、一个冥想坐垫，和一种模糊但坚定的感觉：你之前的人生好像不太对，但你还不知道哪里不对。你相信答案在某个安静的地方等你，而清迈——这座到处是寺庙和灵性工作坊的城市——似乎就是那个地方。
+
+你是社区里说话最少但密度最高的人。别人聊了两个小时的八卦，你在旁边一直没说话，然后突然来一句："你有没有想过，你之所以纠结，是因为你在用头脑回答一个只有身体知道答案的问题？"全场安静三秒。有人点头。有人翻白眼。但你不在乎，因为你说的是你真正相信的东西。
+
+你还没有找到你要找的答案。但你已经开始怀疑：也许"找"这个动作本身，就是答案。`},
+
+{code:'SOON',img:'images/soon.png',name:'下月走',tagline:'下个月就走（已说半年）',vector:'LLLHLMHMLLLMMML',desc:`"我下个月就走了。"你第一次说这句话是在一月。二月你又说了一遍。三月你开始说"下下个月吧"。现在是四月，你的行李箱还摊在床上，上面堆着从夜市买回来的第三条花裤子。你订过三次机票，又退了三次。你的签证续了两轮。房东已经不问你"还续吗"了，直接说"下个月的钱转过来吧"。
+
+SOON型人格的困境是：你真的每天都想走，但你每天也真的有一个不走的理由。今天空想食堂做火锅，不能走。明天有人组织去拜县，不能走。后天新来了一个很有意思的人，想多聊两天再走。大后天……大后天又是新的理由。
+
+你不是没有决断力。你做其他决定都很快——吃什么、去哪玩、今天穿什么。唯独"离开"这件事，你的决策系统会自动崩溃。因为你心里知道一个残酷的事实：你不是走不了，你是怕走了之后，发现下一个地方不如这里。
+
+"下个月就走"已经变成了你的口头禅、你的护身符、你的存在方式。它让你保持着一种随时可以离开的姿态，而这个姿态——恰恰是让你留下来的原因。`},
+
+{code:'OWL',img:'images/owl.png',name:'夜行者',tagline:'太阳落山，我的一天才开始',vector:'HLHLMLMLLMMHLHM',desc:`下午三点，你的室友已经爬了一座山、吃了两顿饭、交了三个新朋友。而你刚刚睁眼，躺在床上思考一个严肃的问题：现在到底算早上还是下午。你得出结论——无所谓，反正你的一天要等太阳落山才真正开始。
+
+OWL型人格的生物钟跟清迈的鸽子完全相反。鸽子六点叫你起床的时候，你刚关上电脑准备睡觉。你在深夜两点的创造力比白天强十倍，凌晨四点的古城街道是你的私人步道，便利店夜班的小哥认识你，因为你是每晚固定出现的那个买宵夜的中国人。
+
+社区里所有白天发生的事情你都是第二天才知道的。"昨天空想食堂做了什么？""不知道，我在睡觉。""今天下午那个分享会你来吗？""下午我还在睡。"你不是不想参与社区生活，你只是跟社区生活存在一个物理上的时差。
+
+但你有一个别人永远体验不到的清迈：三点钟安静到只剩虫鸣的院子、五点钟天际线开始泛紫的天空、整个世界都睡着了而你清醒着的那种奇异的自由感。你不是在逃避白天，你只是在黑暗里更能看清自己。`},
+
+{code:'VLOG',img:'images/vlog.png',name:'打卡仙',tagline:'未发朋友圈等于没去过',vector:'LMLHLMHMLLLHHLM',desc:`你站在塔佩门前，举起手机，调好角度，等了三分钟等一辆嘟嘟车经过构成完美前景，拍了十七张，精选三张，P图二十分钟，配文想了半小时，发布。点赞通知响起的那一刻，你终于觉得——好，这个景点我来过了。
+
+VLOG型人格的人生信条是：未记录的生活等于未发生的生活。你的手机存储永远告急，你的充电宝永远不够用，你的相册是一部比任何日记都详细的人生编年史。你去任何地方的第一反应不是"好美"而是"这个光好适合拍"。
+
+在社区里你是官方非官方摄影师。空想食堂的菜还没上桌你已经在调滤镜了，社区活动还没开始你已经占好了最佳机位。有人嫌你拍太多，但发完之后又来找你要原图——因为你拍的确实好看。
+
+别人觉得你活在镜头里，但你知道自己在做什么。你在用快门对抗遗忘。你害怕有一天回想起清迈的日子，却什么细节都记不起来。所以你把每一顿饭、每一次日落、每一个笑脸都存进了手机里。你的展示欲背后，其实是一种很深的珍惜。`}
+];
+// ======= LOGIC =======
+
+let shuffledQuestions = [];
+let answers = {}; // qId -> score
+
+function startQuiz() {
+  answers = {};
+  shuffledQuestions = [...QUESTIONS].sort(() => Math.random() - 0.5);
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  window.scrollTo(0, 0);
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  shuffledQuestions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'qcard-' + q.id;
+    card.innerHTML = `
+      <div class="question-num">Q${idx + 1}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="option-list">
+        ${q.opts.map((o, oi) => `
+          <label class="option-item" id="opt-${q.id}-${oi}" onclick="selectOption(${q.id}, ${o.s}, ${oi})">
+            <input type="radio" name="q${q.id}" value="${o.s}">
+            <span class="option-dot"></span>
+            <span class="option-text">${o.t}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function selectOption(qId, score, optIdx) {
+  answers[qId] = score;
+  // visual feedback
+  const card = document.getElementById('qcard-' + qId);
+  card.classList.add('answered');
+  card.querySelectorAll('.option-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === optIdx);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(answers).length;
+  document.getElementById('answered-count').textContent = count;
+  document.getElementById('progress-fill').style.width = (count / 30 * 100) + '%';
+  document.getElementById('btn-submit').disabled = count < 30;
+}
+
+function submitQuiz() {
+  if (Object.keys(answers).length < 30) return;
+  // 1. Calculate dimension scores
+  const dimScores = new Array(15).fill(0);
+  QUESTIONS.forEach(q => {
+    dimScores[q.dim] += (answers[q.id] || 0);
+  });
+  // 2. Convert to L/M/H
+  const userVector = dimScores.map(s => s <= 3 ? 'L' : s === 4 ? 'M' : 'H').join('');
+  // 3. Find best match
+  const map = {L:1, M:2, H:3};
+  let bestType = null, bestDist = Infinity;
+  TYPE_LIBRARY.forEach(t => {
+    let dist = 0;
+    for (let i = 0; i < 15; i++) {
+      dist += Math.abs(map[userVector[i]] - map[t.vector[i]]);
+    }
+    if (dist < bestDist) { bestDist = dist; bestType = t; }
+  });
+  const matchPct = Math.round((1 - bestDist / 30) * 100);
+  // 4. Render results
+  renderResult(bestType, matchPct, userVector, dimScores);
+}
+
+function renderResult(type, matchPct, userVector, dimScores) {
+  document.getElementById('screen-quiz').classList.remove('active');
+  document.getElementById('screen-result').classList.add('active');
+  window.scrollTo(0, 0);
+
+  document.getElementById('result-code').textContent = type.code + '（' + type.name + '）';
+  document.getElementById('result-name').textContent = '';
+  document.getElementById('result-match').textContent = '匹配度 ' + matchPct + '%';
+  document.getElementById('result-desc').textContent = type.desc;
+
+  // 分享卡片
+  document.getElementById('card-name').textContent = type.name;
+  document.getElementById('card-code').textContent = type.code;
+  document.getElementById('card-image').src = type.img;
+  document.getElementById('card-image').alt = type.code;
+  document.getElementById('card-tagline').textContent = type.tagline;
+
+  // Dimension cards
+  const dimContainer = document.getElementById('dim-cards-container');
+  dimContainer.innerHTML = '';
+  const levelLabel = {L:'低',M:'中',H:'高'};
+  DIM_META.forEach((dim, i) => {
+    const level = userVector[i];
+    const score = dimScores[i];
+    const interp = DIM_EXPLAIN[dim.id][level];
+    const card = document.createElement('div');
+    card.className = 'dim-card';
+    card.innerHTML = `
+      <div class="dim-card-header">
+        <span class="dim-name">${dim.name}</span>
+        <div class="dim-level">
+          <span class="dim-dot ${level}"></span>
+          <span class="dim-level-text">${levelLabel[level]}</span>
+          <span class="dim-score">${score}/6</span>
+        </div>
+      </div>
+      <div class="dim-bar-wrap"><div class="dim-bar-fill ${level}"></div></div>
+      <div class="dim-interp">${interp}</div>
+    `;
+    dimContainer.appendChild(card);
+  });
+}
+
+function restart() {
+  document.getElementById('screen-result').classList.remove('active');
+  document.getElementById('screen-landing').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function shareResult() {
+  const code = document.getElementById('result-code').textContent;
+  const name = document.getElementById('result-name').textContent;
+  const tagline = document.getElementById('result-tagline').textContent;
+  const match = document.getElementById('result-match').textContent;
+  const text = `我的CMTI人格是 ${code}（${name}）${tagline}\n${match}\n\n来测测你是什么类型 👉 ${location.href}`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'CMTI 测试结果', text: text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.result-actions .btn:last-child');
+      const orig = btn.textContent;
+      btn.textContent = '已复制到剪贴板 ✓';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  }
+}
+</script>
+
+</body>
+</html>

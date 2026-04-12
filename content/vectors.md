@@ -1,0 +1,39 @@
+# CMTI 匹配模板向量
+
+> 维度顺序：W1 W2 W3 S1 S2 S3 L1 L2 L3 N1 N2 N3 C1 C2 C3
+> L=Low(≤3) M=Medium(4) H=High(≥5)
+
+## 动物类（6个）
+
+| # | 类型 | 向量 |
+|---|------|------|
+| 1 | ET（倔行者） | MMHMHLMLLLLHLMH |
+| 2 | LUCKY（暖场王） | MMLHLMMMLHMLHMM |
+| 3 | MILAN（米兰） | LLMLHLLHLMLLLML |
+| 4 | SQUIRREL（反差怪） | LLLMMLMLMMLMLLL |
+| 5 | 404（社区幽灵） | MMMLHLLMLMLMLLL |
+| 6 | GU-GU（咕咕帝） | MHHLMLLLLMLHLLL |
+| 7 | MIHUA（米花） | LLLLMLLLLLLLLML |
+
+## 人类类（18个）
+
+| # | 类型 | 向量 |
+|---|------|------|
+| 7 | WIFI（标准游民） | MMMMMLHLLLMHMMM |
+| 8 | CTRL+Z（撤回者） | HMLHLLMMLMMLHML |
+| 9 | CHEF（厨神） | MMLHLHMHLHHLHML |
+| 10 | RIDE（骑士） | LMMMMLHLMLHHMMH |
+| 11 | MAX（玩商王） | LLLHLHHMHLHMHLH |
+| 12 | GYM（体校生） | MHHMMLLMHMMMLMM |
+| 13 | STAR（交际花） | MMLHLHMMLMMLHMM |
+| 14 | JET-LAG（时差人） | HHHLMLLLLMLMLML |
+| 15 | ALIAS（代号） | MMMLHLMLMLLHLHM |
+| 16 | POKER（牌手） | MMHMMMMLLLLMLLH |
+| 17 | IMPRO（即兴者） | LLLHLMMLLMMLHHH |
+| 18 | HIDE（消失术） | MMMLHLLLLMLHLML |
+| 19 | DUMP（饺子王） | LLLHLLLLHMHLHLL |
+| 20 | SD（山东人） | MMLHLMMMMMMHLMM |
+| 21 | ZEN（灵修者） | LHMLMLMLMMHMLHL |
+| 22 | SOON（下月走） | LLLHLMHMLLLMMML |
+| 23 | OWL（夜行者） | HLHLMLMLLMMHLHM |
+| 24 | VLOG（打卡仙） | LMLHLMHMLLLHHLM |
