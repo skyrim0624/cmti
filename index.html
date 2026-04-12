@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMTI - Chiang Mai Type Indicator</title>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root {
   --bg: #f6f4fa;
@@ -437,6 +436,90 @@ body::after {
   flex-wrap: wrap;
 }
 
+/* === Logo === */
+.cmi-logo {
+  display: block;
+  margin: 0 auto;
+  width: 120px;
+  height: auto;
+}
+.cmi-logo-landing {
+  width: 140px;
+  margin-bottom: 20px;
+}
+.cmi-logo-footer {
+  width: 100px;
+  margin-top: 12px;
+}
+
+/* === Share Buttons === */
+.share-section {
+  text-align: center;
+  margin: 32px 0 24px;
+  padding: 24px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.share-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.share-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+.share-btn-wechat {
+  background: #07C160;
+  color: #fff;
+}
+.share-btn-xhs {
+  background: #FF2442;
+  color: #fff;
+}
+.share-btn-save {
+  background: var(--accent);
+  color: #fff;
+}
+.share-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* === Footer === */
+.result-footer {
+  text-align: center;
+  padding: 32px 0 16px;
+}
+.result-footer-text {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
 /* === Responsive === */
 @media (max-width: 480px) {
   .landing-logo { font-size: 48px; letter-spacing: 4px; }
@@ -478,6 +561,7 @@ body::after {
 <!-- ====== Screen 1: Landing ====== -->
 <div id="screen-landing" class="screen active">
   <div class="container landing">
+    <img src="images/cmi-logo.png" alt="CMI Community" class="cmi-logo cmi-logo-landing">
     <div class="landing-logo">CMTI</div>
     <div class="landing-subtitle">CHIANG MAI TYPE INDICATOR</div>
     <div class="landing-tagline">MBTI已经过时，SBTI已经过气，CMTI来了。</div>
@@ -525,7 +609,31 @@ body::after {
     <div id="dim-cards-container"></div>
     <div class="result-actions">
       <button class="btn btn-outline" onclick="restart()">重新测试</button>
-      <button class="btn" onclick="shareResult()">分享结果</button>
+    </div>
+
+    <!-- 分享区域 -->
+    <div class="share-section">
+      <div class="share-section-title">📤 分享你的结果</div>
+      <div class="share-buttons">
+        <button class="share-btn share-btn-save" onclick="shareResult()">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          保存图片
+        </button>
+        <button class="share-btn share-btn-wechat" onclick="shareToWechat()">
+          <svg viewBox="0 0 24 24"><path d="M9.5 4C5.36 4 2 6.69 2 10c0 1.89 1.08 3.56 2.78 4.66L4 17l2.5-1.18C7.61 16.27 8.53 16.5 9.5 16.5c.17 0 .33 0 .5-.01C9.68 15.84 9.5 15.19 9.5 14.5c0-3.31 3.36-6 7.5-6-.17 0-.33-.01-.5-.01C13.14 4 9.5 6.69 9.5 4zM6.5 8.5a1 1 0 110 2 1 1 0 010-2zm5 0a1 1 0 110 2 1 1 0 010-2zm5.5 3C13.36 11.5 10 13.69 10 16.5s3.36 5 7.5 5c.97 0 1.89-.18 2.71-.5L22.5 22l-.78-2.34C23.42 18.56 24.5 17.39 24.5 16.5c0-2.81-3.36-5-7.5-5zm-2 3.5a.75.75 0 110 1.5.75.75 0 010-1.5zm4 0a.75.75 0 110 1.5.75.75 0 010-1.5z"/></svg>
+          发到微信
+        </button>
+        <button class="share-btn share-btn-xhs" onclick="shareToXHS()">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1h-.5L8 17.5V16l1.5-1L8 13.5V12l1.5 1 1-1.5L12 13l1.5-1.5 1 1.5L16 12v1.5L14.5 15 16 16v1.5L14.5 16H14l-1 1v-3l-1-1-1 1v3z"/></svg>
+          发到小红书
+        </button>
+      </div>
+    </div>
+
+    <!-- 底部 Logo -->
+    <div class="result-footer">
+      <img src="images/cmi-logo.png" alt="CMI Community" class="cmi-logo cmi-logo-footer">
+      <div class="result-footer-text">CMI Community · 清迈数字游民社区</div>
     </div>
   </div>
 </div>
@@ -956,49 +1064,177 @@ function restart() {
 }
 
 function shareResult() {
-  const card = document.getElementById('share-card');
   const btn = document.querySelector('.result-actions .btn:last-child');
   const origText = btn.textContent;
   btn.textContent = '生成中...';
   btn.disabled = true;
 
-  html2canvas(card, {
-    scale: 2,
-    backgroundColor: '#f6f4fa',
-    useCORS: true,
-    allowTaint: true
-  }).then(canvas => {
-    canvas.toBlob(blob => {
-      const file = new File([blob], 'cmti-result.png', { type: 'image/png' });
+  const code = document.getElementById('card-code').textContent;
+  const name = document.getElementById('card-name').textContent;
+  const tagline = document.getElementById('card-tagline').textContent;
+  const match = document.getElementById('result-match').textContent;
+  const imgSrc = document.getElementById('card-image').src;
 
-      // 尝试系统分享（手机端可直接分享到微信/朋友圈/小红书）
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          title: 'CMTI 测试结果',
-          text: '我的CMTI人格是 ' + document.getElementById('card-code').textContent + '（' + document.getElementById('card-name').textContent + '）',
-          files: [file]
-        }).then(() => {
-          btn.textContent = origText;
-          btn.disabled = false;
-        }).catch(() => {
-          // 用户取消分享，改为下载
-          downloadBlob(blob);
-          btn.textContent = origText;
-          btn.disabled = false;
-        });
-      } else {
-        // 桌面端或不支持分享：直接下载图片
-        downloadBlob(blob);
-        btn.textContent = '已保存图片 ✓';
-        btn.disabled = false;
-        setTimeout(() => btn.textContent = origText, 2500);
-      }
-    }, 'image/png');
-  }).catch(() => {
+  // 先加载角色图片
+  const charImg = new Image();
+  charImg.crossOrigin = 'anonymous';
+  charImg.onload = function() {
+    const canvas = document.createElement('canvas');
+    const w = 640, h = 900;
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+
+    // 背景
+    ctx.fillStyle = '#f6f4fa';
+    ctx.fillRect(0, 0, w, h);
+
+    // 白色卡片区域
+    const cardX = 32, cardY = 32, cardW = w - 64, cardH = h - 64;
+    ctx.fillStyle = '#ffffff';
+    roundRect(ctx, cardX, cardY, cardW, cardH, 24);
+    ctx.fill();
+
+    // 卡片边框
+    ctx.strokeStyle = '#ddd8ea';
+    ctx.lineWidth = 1;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 24);
+    ctx.stroke();
+
+    // CMTI 水印（左上）
+    ctx.fillStyle = '#b8a9d4';
+    ctx.font = '600 13px -apple-system, sans-serif';
+    ctx.globalAlpha = 0.5;
+    ctx.fillText('CMTI', cardX + 20, cardY + 30);
+    ctx.globalAlpha = 1;
+
+    // "你的人格类型是："
+    ctx.fillStyle = '#6f6a82';
+    ctx.font = '400 18px -apple-system, "PingFang SC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('你的人格类型是：', w / 2, cardY + 80);
+
+    // 中文名
+    ctx.fillStyle = '#1e1a2e';
+    ctx.font = '800 36px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillText(name, w / 2, cardY + 130);
+
+    // 英文代号
+    ctx.fillStyle = '#5a4a7a';
+    ctx.font = '800 42px -apple-system, sans-serif';
+    ctx.fillText(code, w / 2, cardY + 185);
+
+    // 角色图片（居中，200x200）
+    const imgSize = 200;
+    const imgX = (w - imgSize) / 2;
+    const imgY = cardY + 210;
+    // 圆角裁剪
+    ctx.save();
+    roundRect(ctx, imgX, imgY, imgSize, imgSize, 20);
+    ctx.clip();
+    ctx.drawImage(charImg, imgX, imgY, imgSize, imgSize);
+    ctx.restore();
+
+    // tagline
+    ctx.fillStyle = '#6f6a82';
+    ctx.font = 'italic 400 17px -apple-system, "PingFang SC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(tagline, w / 2, imgY + imgSize + 40);
+
+    // 匹配度
+    ctx.fillStyle = '#7c6d9e';
+    ctx.font = '600 16px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillText(match, w / 2, imgY + imgSize + 75);
+
+    // 底部引导语
+    ctx.fillStyle = '#b8a9d4';
+    ctx.globalAlpha = 0.7;
+    ctx.font = '400 13px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillText('CMI Community · 来测测你是什么类型', w / 2, h - 56);
+    ctx.globalAlpha = 1;
+
+    // 绘制 CMI Logo (底部)
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    logoImg.onload = function() {
+      const logoH = 50;
+      const logoW = logoH * (logoImg.width / logoImg.height);
+      ctx.globalAlpha = 0.8;
+      ctx.drawImage(logoImg, (w - logoW) / 2, h - 50 - logoH, logoW, logoH);
+      ctx.globalAlpha = 1;
+      finishCanvas(canvas, btn, origText, code, name);
+    };
+    logoImg.onerror = function() {
+      finishCanvas(canvas, btn, origText, code, name);
+    };
+    logoImg.src = 'images/cmi-logo.png';
+  };
+  charImg.onerror = function() {
+    alert('图片加载失败，请截图保存');
     btn.textContent = origText;
     btn.disabled = false;
-    alert('图片生成失败，请截图保存');
-  });
+  };
+  charImg.src = imgSrc;
+}
+
+function finishCanvas(canvas, btn, origText, code, name) {
+
+  // 生成图片
+  canvas.toBlob(function(blob) {
+    const file = new File([blob], 'cmti-result.png', { type: 'image/png' });
+
+    // 手机端：尝试系统分享
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'CMTI 测试结果',
+        text: '我的CMTI人格是 ' + code + '（' + name + '）',
+        files: [file]
+      }).catch(function() {
+        downloadBlob(blob);
+      }).finally(function() {
+        btn.textContent = origText;
+        btn.disabled = false;
+      });
+    } else {
+      // 桌面端：直接下载
+      downloadBlob(blob);
+      btn.textContent = '已保存 ✓';
+      btn.disabled = false;
+      setTimeout(function() { btn.textContent = origText; }, 2500);
+    }
+  }, 'image/png');
+}
+
+// 微信分享：生成图片保存后引导用户发到微信
+function shareToWechat() {
+  // 先生成并保存图片
+  shareResult();
+  // 延迟提示
+  setTimeout(function() {
+    alert('图片已保存！\n\n请打开微信，将图片发送给朋友或分享到朋友圈 😊\n\n小提示：长按图片可以直接分享到微信');
+  }, 1500);
+}
+
+// 小红书分享：生成图片保存后引导用户发到小红书
+function shareToXHS() {
+  shareResult();
+  setTimeout(function() {
+    alert('图片已保存！\n\n请打开小红书 App，点击 "+" 发布笔记，选择刚保存的图片 📸\n\n推荐标题：我的CMTI人格测试结果来了！\n推荐标签：#CMTI #清迈 #数字游民 #人格测试');
+  }, 1500);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 function downloadBlob(blob) {
