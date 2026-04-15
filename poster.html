@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMTI Poster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  html, body {
+    width: 1080px;
+    min-height: 1920px;
+    background: #f6f4fa;
+    font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+
+  .poster {
+    width: 1080px;
+    min-height: 1920px;
+    background: linear-gradient(180deg, #1e1a2e 0%, #2d2545 40%, #3a2f5c 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px 48px;
+  }
+
+  /* 背景装饰 */
+  .poster::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,109,158,0.2) 0%, transparent 70%);
+    top: -200px; right: -150px;
+    border-radius: 50%;
+  }
+  .poster::after {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(184,169,212,0.15) 0%, transparent 70%);
+    bottom: 200px; left: -100px;
+    border-radius: 50%;
+  }
+
+  /* 顶部 Logo + 标题区 */
+  .header {
+    text-align: center;
+    padding: 56px 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 16px;
+    border-radius: 12px;
+  }
+  .header-title {
+    font-size: 80px;
+    font-weight: 900;
+    letter-spacing: 12px;
+    background: linear-gradient(135deg, #e8d5f5, #b8a9d4, #7c6d9e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .header-subtitle {
+    font-size: 18px;
+    color: #b8a9d4;
+    letter-spacing: 6px;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-bottom: 16px;
+  }
+  .header-tagline {
+    font-size: 26px;
+    color: #e8e0f2;
+    font-weight: 600;
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .header-divider {
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #b8a9d4, transparent);
+    margin: 24px auto 0;
+  }
+
+  /* 角色网格 */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    padding: 28px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    transition: transform 0.3s;
+  }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-info {
+    padding: 8px 10px 10px;
+    text-align: center;
+  }
+  .card-code {
+    font-size: 14px;
+    font-weight: 800;
+    color: #e8d5f5;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .card-name {
+    font-size: 13px;
+    color: #b8a9d4;
+    font-weight: 600;
+  }
+
+  /* 底部文案区 */
+  .footer {
+    text-align: center;
+    padding: 20px 0 0;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-cta {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .footer-url {
+    display: inline-block;
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #7c6d9e, #5a4a7a);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border: 2px solid rgba(255,255,255,0.2);
+    margin-bottom: 20px;
+  }
+  .footer-desc {
+    font-size: 16px;
+    color: #b8a9d4;
+    opacity: 0.7;
+    line-height: 1.6;
+  }
+  .footer-logo {
+    width: 80px;
+    margin-top: 16px;
+    opacity: 0.8;
+    border-radius: 8px;
+  }
+  .footer-brand {
+    font-size: 14px;
+    color: #b8a9d4;
+    opacity: 0.5;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="poster" id="poster">
+
+  <!-- 顶部 -->
+  <div class="header">
+    <img src="images/cmi-logo.png" class="header-logo" alt="CMI">
+    <div class="header-title">CMTI</div>
+    <div class="header-subtitle">CHIANG MAI TYPE INDICATOR</div>
+    <div class="header-tagline">你是清迈社区的哪种生物？<br>25种人格，总有一款是你</div>
+    <div class="header-divider"></div>
+  </div>
+
+  <!-- 5×5 角色网格 -->
+  <div class="grid">
+    <div class="card"><img class="card-img" src="images/et.png" alt="ET"><div class="card-info"><div class="card-code">ET</div><div class="card-name">倔行者</div></div></div>
+    <div class="card"><img class="card-img" src="images/lucky.png" alt="LUCKY"><div class="card-info"><div class="card-code">LUCKY</div><div class="card-name">暖场王</div></div></div>
+    <div class="card"><img class="card-img" src="images/milan.png" alt="MILAN"><div class="card-info"><div class="card-code">MILAN</div><div class="card-name">米兰</div></div></div>
+    <div class="card"><img class="card-img" src="images/squirrel.png" alt="SQUIRREL"><div class="card-info"><div class="card-code">SQUIRREL</div><div class="card-name">反差怪</div></div></div>
+    <div class="card"><img class="card-img" src="images/404.png" alt="404"><div class="card-info"><div class="card-code">404</div><div class="card-name">社区幽灵</div></div></div>
+
+    <div class="card"><img class="card-img" src="images/gugu.png" alt="GU-GU"><div class="card-info"><div class="card-code">GU-GU</div><div class="card-name">咕咕帝</div></div></div>
+    <div class="card"><img class="card-img" src="images/mihua.png" alt="MIHUA"><div class="card-info"><div class="card-code">MIHUA</div><div class="card-name">米花</div></div></div>
+    <div class="card"><img class="card-img" src="images/wifi.png" alt="WIFI"><div class="card-info"><div class="card-code">WIFI</div><div class="card-name">标准游民</div></div></div>
+    <div class="card"><img class="card-img" src="images/ctrlz.png" alt="CTRL+Z"><div class="card-info"><div class="card-code">CTRL+Z</div><div class="card-name">撤回者</div></div></div>
+    <div class="card"><img class="card-img" src="images/chef.png" alt="CHEF"><div class="card-info"><div class="card-code">CHEF</div><div class="card-name">厨神</div></div></div>
+
+    <div class="card"><img class="card-img" src="images/ride.png" alt="RIDE"><div class="card-info"><div class="card-code">RIDE</div><div class="card-name">骑士</div></div></div>
+    <div class="card"><img class="card-img" src="images/max.png" alt="MAX"><div class="card-info"><div class="card-code">MAX</div><div class="card-name">玩商王</div></div></div>
+    <div class="card"><img class="card-img" src="images/gym.png" alt="GYM"><div class="card-info"><div class="card-code">GYM</div><div class="card-name">体校生</div></div></div>
+    <div class="card"><img class="card-img" src="images/star.png" alt="STAR"><div class="card-info"><div class="card-code">STAR</div><div class="card-name">交际花</div></div></div>
+    <div class="card"><img class="card-img" src="images/jetlag.png" alt="JET-LAG"><div class="card-info"><div class="card-code">JET-LAG</div><div class="card-name">时差人</div></div></div>
+
+    <div class="card"><img class="card-img" src="images/alias.png" alt="ALIAS"><div class="card-info"><div class="card-code">ALIAS</div><div class="card-name">代号</div></div></div>
+    <div class="card"><img class="card-img" src="images/poker.png" alt="POKER"><div class="card-info"><div class="card-code">POKER</div><div class="card-name">牌手</div></div></div>
+    <div class="card"><img class="card-img" src="images/impro.png" alt="IMPRO"><div class="card-info"><div class="card-code">IMPRO</div><div class="card-name">即兴者</div></div></div>
+    <div class="card"><img class="card-img" src="images/hide.png" alt="HIDE"><div class="card-info"><div class="card-code">HIDE</div><div class="card-name">消失术</div></div></div>
+    <div class="card"><img class="card-img" src="images/dump.png" alt="DUMP"><div class="card-info"><div class="card-code">DUMP</div><div class="card-name">饺子王</div></div></div>
+
+    <div class="card"><img class="card-img" src="images/sd.png" alt="SD"><div class="card-info"><div class="card-code">SD</div><div class="card-name">山东人</div></div></div>
+    <div class="card"><img class="card-img" src="images/zen.png" alt="ZEN"><div class="card-info"><div class="card-code">ZEN</div><div class="card-name">灵修者</div></div></div>
+    <div class="card"><img class="card-img" src="images/soon.png" alt="SOON"><div class="card-info"><div class="card-code">SOON</div><div class="card-name">下月走</div></div></div>
+    <div class="card"><img class="card-img" src="images/owl.png" alt="OWL"><div class="card-info"><div class="card-code">OWL</div><div class="card-name">夜行者</div></div></div>
+    <div class="card"><img class="card-img" src="images/vlog.png" alt="VLOG"><div class="card-info"><div class="card-code">VLOG</div><div class="card-name">打卡仙</div></div></div>
+  </div>
+
+  <!-- 底部 CTA -->
+  <div class="footer">
+    <div class="footer-cta">MBTI已经过时，CMTI来了<br>扫码来测测你是哪一款？</div>
+    <div class="footer-url">🔗 cmti.uk</div>
+    <div class="footer-desc">30道题 · 15个维度 · 25种清迈人格<br>由CMI清迈数字游民社区出品</div>
+    <img src="images/cmi-logo.png" class="footer-logo" alt="CMI Community">
+    <div class="footer-brand">CMI COMMUNITY</div>
+  </div>
+
+</div>
+</body>
+</html>
